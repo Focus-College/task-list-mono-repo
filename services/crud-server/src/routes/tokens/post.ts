@@ -8,7 +8,6 @@ export function post( app:any ){
 
         const username = request.body.username;
         const password = request.body.password;
-        
         const matchedUser = UserModel.getByUsername(username);
         
         if(!matchedUser){
@@ -18,7 +17,7 @@ export function post( app:any ){
             return;
         }
 
-        const hashedPassword = PasswordModel.hash(`${password}-${matchedUser.fullName}`);
+        const hashedPassword = PasswordModel.hash(`${password}`);
 
         if(!(hashedPassword === matchedUser.password)){
             response.status(401).send({
