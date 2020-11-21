@@ -1,6 +1,5 @@
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
-import { tasks, tasks as tasksApi } from '../api/tasks';
-import TaskList from '../components/TaskList';
+import api from '../api';
 
 export interface ITask {
     id: number;
@@ -34,27 +33,31 @@ export function useTaskList(){
     const remainingTaskList = useRecoilValue(remainingTaskListState);
     
     const loadRemoteTasks = () => {
-        tasksApi.get().then( response => {
+        api.tasks.get().then( response => {
             setTaskList( response.data );
         });
     }
 
     const create = ( description:string ) => {
-        tasksApi.post({ done: false, description }).then( response => {
+        api.tasks.post({ done: false, description }).then( response => {
             setTaskList([ ...taskList, response.data ]);
         });
     }
 
     const markDone = ( id:number, done:boolean ) => {
-        tasksApi.patch( id, { done }).then( response => {
-            return tasksApi.get();
+        api.tasks.patch( id, { done }).then( response => {
+            return api.tasks.get();
         }).then( response => {
             setTaskList( response.data );
         });
     }
 
-    const remove = () => {
-
+    const remove = ( id:number ) => {
+        api.tasks.delete( id ).then(() => {
+            return api.tasks.get();
+        }).then( response => {
+            setTaskList( response.data );
+        });
     }
 
     return {

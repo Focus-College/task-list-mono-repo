@@ -1,28 +1,18 @@
-import React, { useEffect } from 'react';
-import TaskList from './components/TaskList';
-import './App.css';
-import TaskListSummary from './components/TaskListSummary';
-import { useTaskList } from './data/useTaskList';
+import React from 'react';
+import { Route, Switch } from 'react-router';
+import Task from './pages/Tasks';
+import LoginForm from './components/LoginForm';
+import './style.scss';
  
 function App() {
     
-    const { loadRemoteTasks } = useTaskList();
-
-    useEffect(() => {
-        loadRemoteTasks();
-    }, []);
-
     return (
-        <div className="App">
-            <div style={{ width:"25%", float:"left" }}>{" "}</div>
-            <div style={{ width:"25%", float:"left" }}>
-                <TaskListSummary />
-            </div>
-            <div style={{ width:"25%", float:"left" }}>
-                <TaskList />
-            </div>
-        </div>
-    );
+        <Switch>
+            <Route path="/login" component={LoginForm} />
+            <Route path="/tasks" component={Task} />
+        </Switch>
+    )
+    
 }
 
 export default App;
