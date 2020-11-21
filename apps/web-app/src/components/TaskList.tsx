@@ -20,7 +20,7 @@ function TaskList(){
     function onCheckTaskHandler( task:ITask ){
         
         return function( event:ChangeEvent<HTMLInputElement> ){
-            markDone(task.id);
+            markDone(task.id, event.target.checked);
         }
 
     }

@@ -1,5 +1,6 @@
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { tasks, tasks as tasksApi } from '../api/tasks';
+import TaskList from '../components/TaskList';
 
 export interface ITask {
     id: number;
@@ -44,8 +45,8 @@ export function useTaskList(){
         });
     }
 
-    const markDone = ( id:number ) => {
-        tasksApi.patch( id, { done: true }).then( response => {
+    const markDone = ( id:number, done:boolean ) => {
+        tasksApi.patch( id, { done }).then( response => {
             return tasksApi.get();
         }).then( response => {
             setTaskList( response.data );
