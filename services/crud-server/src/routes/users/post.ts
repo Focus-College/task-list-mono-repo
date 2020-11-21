@@ -11,7 +11,7 @@ export function post( app:any ){
         const payload:IUser = request.body;
 
         // hash password so we don't know what it is
-        payload.password = PasswordModel.hash(`${payload.password}-${payload.fullName}`);
+        payload.password = PasswordModel.hash(payload.password);
 
         const users = UserModel.getAll();
         users.push(payload);
