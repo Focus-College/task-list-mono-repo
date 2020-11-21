@@ -18,7 +18,7 @@ export function post( app:any ){
             return;
         }
 
-        const hashedPassword = PasswordModel.hash(`${password}-${matchedUser.fullName}`);
+        const hashedPassword = PasswordModel.hash(`${password}`);
 
         if(!(hashedPassword === matchedUser.password)){
             response.status(401).send({
