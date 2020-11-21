@@ -4,7 +4,7 @@ import { ITask, useTaskList } from '../data/useTaskList';
 
 function TaskList(){
 
-    const { taskList, setTaskList, create, markDone } = useTaskList();
+    const { taskList, setTaskList, create, markDone, remove } = useTaskList();
     const [ newTaskDescription, setNewTaskDescription ] = useState<string>("");
     
 
@@ -27,7 +27,11 @@ function TaskList(){
 
     function onDeleteTaskHandler( index:number ){
         return function(){
-            setTaskList(taskList.filter((task, i) => i !== index));
+            const taskToDelete = taskList.find((task, i) => i !== index);
+            
+            if( taskToDelete ){
+                remove( taskToDelete.id );
+            }
         }
     }
 
