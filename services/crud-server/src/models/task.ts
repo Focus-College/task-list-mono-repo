@@ -1,66 +1,65 @@
 import fs from 'fs';
 
-// read user
-const path = `${__dirname}/../data`;
-const file = `${path}/tasks.json`;
-
-if(!fs.existsSync(path)){
-    fs.mkdirSync(path);
-}
-
-if(!fs.existsSync(file)){
-    fs.writeFileSync(file, JSON.stringify([]), { encoding: 'utf-8' });
-}
+import { MongoClient, ObjectId } from "mongodb";
+const client = new MongoClient("mongodb+srv://admin:3xrZS2rCphtLYwDd@operatingdatastorage.byj0b.mongodb.net/bradley");
 
 export interface ITask {
-    id: number,
+    _id: ObjectId,
     done: boolean,
     description: string
 }
 
 export const TaskModel = {
 
-    getAll: ():ITask[] => {
-        const tasks = JSON.parse(fs.readFileSync(file, { encoding: 'utf-8' }));
+    getAll: async ():Promise<ITask[]> => {
+        
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        // const query = { done: true };
+        const tasks:ITask[] = await collection.find({}).toArray();
+        
         console.log('TaskModel.getAll', tasks);
         return tasks;
+
     },
 
     setAll: ( users:ITask[] ) => {
-        fs.writeFileSync(file, JSON.stringify(users, null, 4), { encoding: 'utf-8' });
+        // fs.writeFileSync(file, JSON.stringify(users, null, 4), { encoding: 'utf-8' });
     },
 
-    getById: ( taskId:number ): ITask|undefined => {
+    getById: async ( taskId:string ): Promise<ITask|undefined> => {
 
-        return TaskModel.getAll().find( task => {
-            console.log(task, taskId);
-            return task.id === taskId;
-        });
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        const task:ITask = await collection.findOne({ _id: new ObjectId(taskId) });
+        return task;
 
     },
 
     update: ( task:ITask ) => {
 
-        const tasks = TaskModel.getAll();
-        const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
-        tasks.splice(indexOfCurrentTask, 1, task);
-        TaskModel.setAll(tasks);
+        // const tasks = TaskModel.getAll();
+        // const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
+        // tasks.splice(indexOfCurrentTask, 1, task);
+        // TaskModel.setAll(tasks);
 
     },
 
     delete: ( task:ITask ) => {
 
-        const tasks = TaskModel.getAll();
-        const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
-        tasks.splice(indexOfCurrentTask, 1);
-        TaskModel.setAll(tasks);
+        // const tasks = TaskModel.getAll();
+        // const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
+        // tasks.splice(indexOfCurrentTask, 1);
+        // TaskModel.setAll(tasks);
 
     },
 
     findNextId: () => {
         
-        const tasks = TaskModel.getAll();
-        return tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
+        // const tasks = TaskModel.getAll();
+        // return tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
     
     }
 

@@ -4,10 +4,10 @@ import { TaskModel } from '../../../models/task';
 export function get( app:any ){
 
     // responds with all tasks
-    app.get("/tasks/:taskId", authenticateToken, (request:any, response:any) => {
+    app.get("/tasks/:taskId", authenticateToken, async (request:any, response:any) => {
         
-        const taskId = Number(request.params.taskId);
-        const foundTask = TaskModel.getById(taskId);
+        const taskId = request.params.taskId;
+        const foundTask = await TaskModel.getById(taskId);
 
         if(foundTask){
             response.send( foundTask );
