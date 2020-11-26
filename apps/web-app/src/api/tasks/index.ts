@@ -19,7 +19,7 @@ export default {
         });
     },
 
-    patch: async ( id:number, body:any ) => {
+    patch: async ( id:string, body:any ) => {
         return axios.patch(`${HOSTNAME}/tasks/${id}`, body, {
             headers: {
                 Authorization: `Bearer ${window.localStorage.getItem('token')}`
@@ -27,7 +27,7 @@ export default {
         });
     },
 
-    delete: async ( id:number ) => {
+    delete: async ( id:string ) => {
         return axios.delete(`${HOSTNAME}/tasks/${id}`, {
             headers: {
                 Authorization: `Bearer ${window.localStorage.getItem('token')}`

@@ -20,7 +20,7 @@ function TaskList(){
     function onCheckTaskHandler( task:ITask ){
         
         return function( event:ChangeEvent<HTMLInputElement> ){
-            markDone(task.id, event.target.checked);
+            markDone(task._id, event.target.checked);
         }
 
     }
@@ -30,7 +30,7 @@ function TaskList(){
             const taskToDelete = taskList.find((task, i) => i !== index);
             
             if( taskToDelete ){
-                remove( taskToDelete.id );
+                remove( taskToDelete._id );
             }
         }
     }
