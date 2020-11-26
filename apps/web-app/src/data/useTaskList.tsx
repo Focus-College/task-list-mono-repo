@@ -2,7 +2,7 @@ import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import api from '../api';
 
 export interface ITask {
-    id: number;
+    _id: string;
     done: boolean;
     description: string;
 }
@@ -44,7 +44,7 @@ export function useTaskList(){
         });
     }
 
-    const markDone = ( id:number, done:boolean ) => {
+    const markDone = ( id:string, done:boolean ) => {
         api.tasks.patch( id, { done }).then( response => {
             return api.tasks.get();
         }).then( response => {
@@ -52,7 +52,7 @@ export function useTaskList(){
         });
     }
 
-    const remove = ( id:number ) => {
+    const remove = ( id:string ) => {
         api.tasks.delete( id ).then(() => {
             return api.tasks.get();
         }).then( response => {

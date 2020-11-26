@@ -1,67 +1,89 @@
-import fs from 'fs';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// read user
-const path = `${__dirname}/../data`;
-const file = `${path}/tasks.json`;
-
-if(!fs.existsSync(path)){
-    fs.mkdirSync(path);
-}
-
-if(!fs.existsSync(file)){
-    fs.writeFileSync(file, JSON.stringify([]), { encoding: 'utf-8' });
-}
+import { MongoClient, ObjectId } from "mongodb";
+const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
 
 export interface ITask {
-    id: number,
+    _id: ObjectId,
     done: boolean,
     description: string
 }
 
+type ITaskStringId = Omit<ITask, "_id"> & { _id: string };
+
 export const TaskModel = {
 
-    getAll: ():ITask[] => {
-        const tasks = JSON.parse(fs.readFileSync(file, { encoding: 'utf-8' }));
+    getAll: async ():Promise<ITask[]> => {
+        
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        // const query = { done: true };
+        const tasks:ITask[] = await collection.find({}).toArray();
+        
         console.log('TaskModel.getAll', tasks);
         return tasks;
+
     },
 
-    setAll: ( users:ITask[] ) => {
-        fs.writeFileSync(file, JSON.stringify(users, null, 4), { encoding: 'utf-8' });
+    getById: async ( taskId:string ): Promise<ITask|undefined> => {
+
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        return collection.findOne({ _id: new ObjectId(taskId) });
+
     },
 
-    getById: ( taskId:number ): ITask|undefined => {
+    updateFromJson: async( task:ITaskStringId ) => {
 
-        return TaskModel.getAll().find( task => {
-            console.log(task, taskId);
-            return task.id === taskId;
+        return TaskModel.update({
+            ...task,
+            _id: new ObjectId( task._id )
         });
 
     },
-
-    update: ( task:ITask ) => {
-
-        const tasks = TaskModel.getAll();
-        const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
-        tasks.splice(indexOfCurrentTask, 1, task);
-        TaskModel.setAll(tasks);
-
-    },
-
-    delete: ( task:ITask ) => {
-
-        const tasks = TaskModel.getAll();
-        const indexOfCurrentTask = tasks.map(_task=>_task.id).indexOf( task.id );
-        tasks.splice(indexOfCurrentTask, 1);
-        TaskModel.setAll(tasks);
-
-    },
-
-    findNextId: () => {
-        
-        const tasks = TaskModel.getAll();
-        return tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
     
+    update: async ( task:ITask ) => {
+
+        try {
+        
+            await client.connect();
+            const database = client.db('bradley');
+            const collection = database.collection('tasks');
+            
+            console.log( task._id, typeof task._id );
+            
+            const update = await collection.updateOne({ _id: task._id }, { $set: { ...task }});
+            return task;
+
+        } catch(e) {
+            console.log(task);
+            console.log(e);
+            return;
+        }
+    
+
+    },
+
+    create: async( taskToCreate:Omit<ITask, "_id"> ):Promise<ITask> => {
+        
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        const insert = await collection.insertOne( taskToCreate );
+        return { _id: insert.insertedId, ...taskToCreate };
+
+    },
+
+    delete: async ( task:ITask ) => {
+
+        await client.connect();
+        const database = client.db('bradley');
+        const collection = database.collection('tasks');
+        await collection.deleteOne({ _id: task._id });
+
     }
 
 }

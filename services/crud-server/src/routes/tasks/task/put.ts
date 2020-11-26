@@ -4,10 +4,10 @@ import { TaskModel } from '../../../models/task';
 export function put( app:any ){
 
     // NOT IDEMPOTENT: You can send only specific value to change
-    app.put("/tasks/:taskId", authenticateToken, ( request:any, response:any ) => {
+    app.put("/tasks/:taskId", authenticateToken, async ( request:any, response:any ) => {
         
-        const taskId = Number(request.params.taskId);
-        const currentTask = TaskModel.getById(taskId);
+        const taskId = request.params.taskId;
+        const currentTask = await TaskModel.getById(taskId);
         
         // make sure the task exists
         if(!currentTask){
@@ -27,8 +27,8 @@ export function put( app:any ){
             return;
         }
         
-        TaskModel.update( request.body );
-        response.status(200).send( request.body );
+        const task = await TaskModel.updateFromJson( request.body );
+        response.status(200).send( task );
 
     });
 
